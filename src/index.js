@@ -1,12 +1,18 @@
-const express = require("express");
+import express from "express";
+import bodyParser from "body-parser";
+import laptopRoutes from "../routes/laptops.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
+
+app.use(bodyParser.json());
+
+app.use("/laptops", laptopRoutes);
 
 app.get("/", (req, res) => {
-    res.send("<h2> It's Working! </h2>");
+    res.send("Hello from homepage");
 });
 
 app.listen(PORT, () => {
-    console.log(`API is listening on ${PORT}`);
+    console.log(`server running on port: http://localhost:${PORT}`)
 });
