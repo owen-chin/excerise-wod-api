@@ -1,8 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
+import Laptop from "../models/laptop.js"
+// let laptops = []
 
-let laptops = []
-export const getLaptops = (req, res) => {
-    res.send(laptops);
+export const getLaptops = async (req, res) => {
+    try {
+        const laptops = await Laptop.find()
+        res.send(laptops);
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 };
 
 export const getLaptop = (req, res) => {
