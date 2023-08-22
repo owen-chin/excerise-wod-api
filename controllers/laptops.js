@@ -1,53 +1,79 @@
-import { v4 as uuidv4 } from 'uuid';
 import Laptop from "../models/laptop.js"
-// let laptops = []
 
 export const getLaptops = async (req, res) => {
     try {
         const laptops = await Laptop.find()
-        res.send(laptops);
+        res.send(laptops)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
-};
+}
 
-export const getLaptop = (req, res) => {
-    const id = req.params.id;
+export const getLaptop = [getLaptopById, (req, res) => {
+    res.json(res.laptop)
+}]
 
-    const foundLaptop = laptops.find((laptop) => laptop.id === id);
-
-    res.send(foundLaptop);
-};
-
-export const createLaptop = (req, res) => {
-    const laptop = req.body
-    const laptopWithId = { ...laptop, id:uuidv4() }
-
-    // Adds an ID to the laptop
-    laptops.push(laptopWithId);
-
-    res.send(`Laptop with name: ${laptop.name} added to database.`);
-};
-
-export const deleteLaptop = (req, res) => {
-    const id = req.params.id;
-
-    laptops = laptops.filter((laptop) => laptop.id !== id);
-
-    res.send(`Laptop with id: ${id} has been deleted from database`);
-};
-
-export const updateLaptop = (req, res) => {
-    const id = req.params.id;
-    const { name, weight } = req.body;
-
-    const foundLaptop = laptops.find((laptop) => laptop.id === id);
-    
-    if(name) {
-        foundLaptop.name = name;
+export const createLaptop = async (req, res) => {
+    try {
+        const laptop = new Laptop ({
+            name: req.body.name,
+            weight: req.body.weight,
+            batteryLife: req.body.batteryLife,
+            size: req.body.size,
+            price: req.body.price
+        })
+        const newLaptop = await laptop.save()
+        res.status(201).json(newLaptop)
+    } catch (error) {
+        res.status(400).json({ message: error.message })
     }
-    if(weight) {
-        foundLaptop.weight = weight;
+}
+
+export const deleteLaptop = [getLaptopById, async (req, res) => {
+    try {
+        await res.laptop.deleteOne()
+        res.status(200).json({ message: `Deleted Laptop`})
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
-    res.send(`User with id: ${id} has been updated`)
-};
+}]
+
+export const updateLaptop = [getLaptopById, async (req, res) => {
+    const { name, weight, price, size, batteryLife } = req.body
+    if (name != null) {
+        res.laptop.name = name
+    }
+    if (weight != null) {
+        res.laptop.weight = weight
+    }
+    if (price != null) {
+        res.laptop.price = price
+    }
+        if (size != null) {
+        res.laptop.size = size
+    }
+    if (batteryLife != null) {
+        res.laptop.batteryLife = batteryLife
+    }
+    try {
+        const updatedLaptop = await res.laptop.save()
+        res.status(200).json(updateLaptop)
+    } catch (error) {
+        res.status(400).json({ message: error.message})
+    }
+}]
+
+async function getLaptopById(req, res, next) {
+    let laptop
+    try {
+        laptop = await Laptop.findById(req.params.id)
+        if (laptop == null) {
+            return res.status(404).json({ message: "Cannot find laptop"})
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+
+    res.laptop = laptop
+    next()
+}

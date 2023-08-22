@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
 
 const laptopSchema = new mongoose.Schema({
     name: {
@@ -16,8 +16,12 @@ const laptopSchema = new mongoose.Schema({
     size: {
         type: Number,
         required: true
+    },
+    price: {
+        type: Number,
+        required: true
     }
 });
 
 const Laptop =  mongoose.model("Laptop", laptopSchema)
-export default Laptop;
+export default Laptop
